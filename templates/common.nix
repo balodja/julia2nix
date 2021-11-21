@@ -7,6 +7,7 @@
   cacert,
   jq,
   julia,
+  baseJulia,
   lib,
   python3,
   runCommand,
@@ -129,6 +130,7 @@ let
     cp ${overridesToml} $out/artifacts/Overrides.toml
 
     export JULIA_DEPOT_PATH=$out
+    export JULIA_SSL_CA_ROOTS_PATH=${baseJulia}/share/julia/cert.pem
     julia -e ' \
       using Pkg
       Pkg.Registry.add(RegistrySpec(path="${registry}"))
@@ -156,5 +158,5 @@ runCommand "julia-env" {
   buildInputs = [makeWrapper];
 } ''
   mkdir -p $out/bin
-  makeWrapper $julia/bin/julia $out/bin/julia --suffix JULIA_DEPOT_PATH : "$depot" $makeWrapperArgs
+  makeWrapper $julia/bin/julia $out/bin/julia --run 'export JULIA_DEPOT_PATH=''${JULIA_DEPOT_PATH-$HOME/.julia}' --suffix JULIA_DEPOT_PATH : "$depot" $makeWrapperArgs
 ''

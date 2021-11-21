@@ -5,7 +5,7 @@ with pkgs;
 
 let
   # The base Julia version
-  baseJulia = julia_15;
+  baseJulia = julia_16-bin;
 
   # Extra libraries for Julia's LD_LIBRARY_PATH.
   # Recent Julia packages that use Artifacts.toml to specify their dependencies
@@ -27,7 +27,7 @@ let
 in
 
 callPackage ./common.nix {
-  inherit julia;
+  inherit julia baseJulia;
 
   # Run Pkg.precompile() to precompile all packages?
   precompile = true;
