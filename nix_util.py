@@ -16,7 +16,7 @@ def fetch_sha256(url, rev="HEAD", deepClone=False, leaveDotGit=False, fetchSubmo
       + (["--fetch-submodules"] if fetchSubmodules else [])
 
     p = subprocess.run([
-        nix_prefetch_git,
+        str(nix_prefetch_git),
         "--url", url,
         "--rev", rev,
         "--quiet"
