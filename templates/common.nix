@@ -123,6 +123,9 @@ let
     cp ${manifestToml} ./Manifest.toml
     cp ${./Project.toml} ./Project.toml
 
+    mkdir -p $out/registries
+    ln -s ${registry} $out/registries/General
+
     mkdir -p $out/artifacts
     cp ${overridesToml} $out/artifacts/Overrides.toml
 
@@ -130,13 +133,10 @@ let
     export JULIA_SSL_CA_ROOTS_PATH=${baseJulia}/share/julia/cert.pem
     julia -e ' \
       using Pkg
-      Pkg.Registry.add(RegistrySpec(path="${registry}"))
+      Pkg.Registry.status()
 
       Pkg.activate(".")
       Pkg.instantiate()
-
-      # Remove the registry to save space
-      Pkg.Registry.rm("General")
     '
 
     if [[ -n "$precompile" ]]; then
