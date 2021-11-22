@@ -151,7 +151,7 @@ let
 in
 
 runCommand "julia-env" {
-  inherit julia depot makeWrapperArgs;
+  inherit julia baseJulia depot makeWrapperArgs;
   buildInputs = [makeWrapper];
 } ''
   mkdir -p $out/bin
