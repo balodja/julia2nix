@@ -120,8 +120,9 @@ let
     echo "Using registry $registry"
     echo "Using Julia ${julia}/bin/julia"
 
-    cp ${manifestToml} ./Manifest.toml
-    cp ${./Project.toml} ./Project.toml
+    mkdir -p $out/environments/nixenv
+    cp ${manifestToml} $out/environments/nixenv/Manifest.toml
+    cp ${./Project.toml} $out/environments/nixenv/Project.toml
 
     mkdir -p $out/registries
     ln -s ${registry} $out/registries/General
@@ -129,20 +130,20 @@ let
     mkdir -p $out/artifacts
     cp ${overridesToml} $out/artifacts/Overrides.toml
 
-    export JULIA_DEPOT_PATH=$out
-    export JULIA_SSL_CA_ROOTS_PATH=${baseJulia}/share/julia/cert.pem
+    export JULIA_DEPOT_PATH=$out:${baseJulia}/share/julia
+    #export JULIA_SSL_CA_ROOTS_PATH=${baseJulia}/share/julia/cert.pem
     julia -e ' \
       using Pkg
       Pkg.Registry.status()
 
-      Pkg.activate(".")
+      Pkg.activate("@nixenv")
       Pkg.instantiate()
     '
 
     if [[ -n "$precompile" ]]; then
       julia -e ' \
         using Pkg
-        Pkg.activate(".")
+        Pkg.activate("@nixenv")
         Pkg.precompile()
       '
     fi
@@ -155,5 +156,5 @@ runCommand "julia-env" {
   buildInputs = [makeWrapper];
 } ''
   mkdir -p $out/bin
-  makeWrapper $julia/bin/julia $out/bin/julia --run 'export JULIA_DEPOT_PATH=''${JULIA_DEPOT_PATH-$HOME/.julia}' --suffix JULIA_DEPOT_PATH : "$depot" $makeWrapperArgs
+  makeWrapper $julia/bin/julia $out/bin/julia --set-default JULIA_PROJECT ${depot}/environments/nixenv --run 'export JULIA_DEPOT_PATH=''${JULIA_DEPOT_PATH-$HOME/.julia}' --suffix JULIA_DEPOT_PATH : "$depot" $makeWrapperArgs
 ''
