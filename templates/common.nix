@@ -131,19 +131,19 @@ let
     cp ${overridesToml} $out/artifacts/Overrides.toml
 
     export JULIA_DEPOT_PATH=$out:${baseJulia}/share/julia
-    #export JULIA_SSL_CA_ROOTS_PATH=${baseJulia}/share/julia/cert.pem
+    export JULIA_SSL_CA_ROOTS_PATH=${baseJulia}/share/julia/cert.pem
     julia -e ' \
       using Pkg
       Pkg.Registry.status()
 
-      Pkg.activate("@nixenv")
+      Pkg.activate("nixenv"; shared=true)
       Pkg.instantiate()
     '
 
     if [[ -n "$precompile" ]]; then
       julia -e ' \
         using Pkg
-        Pkg.activate("@nixenv")
+        Pkg.activate("nixenv"; shared=true)
         Pkg.precompile()
       '
     fi
